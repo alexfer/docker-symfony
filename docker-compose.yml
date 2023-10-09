@@ -1,0 +1,59 @@
+version: '3'
+
+networks:
+    internal:
+
+services:
+    nginx:
+        image: nginx:stable-alpine
+        container_name: symfony-nginx
+        ports:
+          - "8081:80"
+        volumes:
+          - ./dev:/var/www
+          - ./config/nginx:/etc/nginx/conf.d
+          - ./data/logs:/var/log/nginx/
+        depends_on:
+          - php
+          - mysql
+        networks:
+          - internal
+    php:
+        image: php:8.2
+        build:
+          context: ./config/php
+          dockerfile: Dockerfile
+        container_name: symfony-php-82
+        volumes:
+          - ./dev:/var/www
+          - ./config/php/php.ini:/usr/local/etc/php/php.ini
+        ports:
+          - "9001:9001"
+        networks:
+          - internal
+    mysql:
+        image: mysql:8.0
+        container_name: mysql-8
+        restart: unless-stopped
+        command: --default-authentication-plugin=mysql_native_password
+        # command: --innodb_use_native_aio=0
+        ports:
+          - 3399:3306
+        volumes:
+          - ./data/mysql:/var/lib/mysql
+        environment:
+          MYSQL_ROOT_PASSWORD: 7212104
+        networks:
+         - internal
+    phpmyadmin:
+        container_name: symfony-phpmyadmin
+        image: phpmyadmin
+        restart: always
+        links:
+          - mysql
+        ports:
+           - 8082:80
+        environment:
+           - PMA_ARBITRARY=1
+        networks:
+         - internal
