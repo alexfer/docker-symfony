@@ -5,29 +5,35 @@ RUN set -ex \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
-    postgresql-dev \     
+    libwebp-dev \
+    libxpm-dev \
+    postgresql-dev \
     libzip-dev \
-    imagemagick-dev \ 
+    imagemagick-dev \
     libtool \
     curl \
     wget \
-    bash   
+    bash
 
-RUN docker-php-ext-install pdo pdo_pgsql intl opcache gd zip pdo_mysql
+RUN docker-php-ext-install pdo intl opcache zip pdo_mysql
 #RUN pecl install gmagick-2.0.6RC1
 
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pgsql pdo_pgsql
 
-RUN docker-php-ext-configure gd \
-#    --with-png=/usr/include/ \
-    --with-jpeg=/usr/include/ \
-    --with-freetype=/usr/include/
+RUN docker-php-ext-configure gd --enable-gd --with-webp --with-freetype --with-jpeg --with-xpm \
+    && docker-php-ext-install gd
 
-#RUN docker-php-ext-install gd
-#RUN docker-php-ext-install zip
-#RUN docker-php-ext-install pdo_mysql
-   
+RUN apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS \
+        && pecl install apcu \
+        && docker-php-ext-enable apcu \
+        && pecl install redis \
+        && docker-php-ext-enable redis \
+        && pecl clear-cache \
+        && apk del .build-dependencies
+
+#RUN pecl install redis && docker-php-ext-enable redis
+
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 RUN curl -sS https://get.symfony.com/cli/installer | bash
