@@ -17,7 +17,6 @@ RUN set -ex \
     bash
 
 RUN docker-php-ext-install pdo intl opcache zip pdo_mysql
-#RUN pecl install gmagick-2.0.6RC1
 
 RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pgsql pdo_pgsql
