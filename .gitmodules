@@ -1,0 +1,3 @@
+[submodule "dev/project/techspace"]
+	path = dev/project/techspace
+	url = git@github.com:alexfer/techspace.git
