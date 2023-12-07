@@ -9,7 +9,8 @@ RUN set -ex \
     libxpm-dev \
     postgresql-dev \
     libzip-dev \
-    imagemagick-dev \
+    graphicsmagick \
+    imagemagick \
     libtool \
     curl \
     wget \
@@ -29,10 +30,10 @@ RUN apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS \
         && docker-php-ext-enable apcu \
         && pecl install redis \
         && docker-php-ext-enable redis \
+#        && pecl install gmagick-2.0.6RC1 \
+#        && docker-php-ext-enable gmagick \
         && pecl clear-cache \
         && apk del .build-dependencies
-
-#RUN pecl install redis && docker-php-ext-enable redis
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
